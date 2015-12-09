@@ -1,0 +1,128 @@
+package com.example.taxiclient;
+
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.Settings;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.view.Menu;
+import android.widget.Button;
+import android.widget.Button;
+import android.widget.TextView;
+import android.view.View;
+import android.view.View.OnClickListener;
+
+public class Loginprompt extends Activity {
+	TextView t;
+
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_loginprompt);
+		Button button;
+		SharedPreferences spref = getSharedPreferences("com.pranav.driverapp", Context.MODE_PRIVATE);
+
+
+		//check for already logged in
+		if(!spref.getString("username", "XYZZY").equals("XYZZY")) //usr already logged in. show register activity
+		{
+			Intent a = new Intent(Loginprompt.this, MainActivity.class);
+			startActivity(a);
+		}
+
+
+
+
+//		t = (TextView)findViewById(R.id.textView1);
+//		t.setOnClickListener(this);
+
+		button = (Button) findViewById(R.id.buttonYes);
+
+		button.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				//			    Intent intent = new Intent(Loginprompt.this, MainActivity.class);
+				Intent intent = new Intent(Loginprompt.this, LoginActivity.class);
+				startActivity(intent);   
+
+			}
+
+		});
+
+
+
+		button = (Button) findViewById(R.id.button1);
+
+		button.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				Intent intent = new Intent(Loginprompt.this, Fblogin.class);
+				startActivity(intent);
+
+
+
+
+			}});
+
+		TextView newusr=(TextView) findViewById(R.id.textView1);
+		
+		newusr.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+			Intent x= new Intent(Loginprompt.this,Register.class);
+			startActivity(x);
+			}
+			
+			});
+
+
+
+
+	}
+
+
+
+	public void onClick(View arg0) {
+		//for clickable textview
+		Intent intent = new Intent(Loginprompt.this, Register.class);
+		startActivity(intent);
+
+	}
+
+
+
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.loginprompt, menu);
+		return true;
+	}
+
+
+	private void updateView() {
+	}
+
+
+
+	private class SessionStatusCallback implements Session.StatusCallback {
+		@Override
+		public void call(Session session, SessionState state, Exception exception) {
+			updateView();
+		}
+	}
+}
+
+
+
+

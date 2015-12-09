@@ -1,0 +1,198 @@
+package com.pranav.driverApp;
+
+//import java.io.BufferedReader;
+//import java.io.IOException;
+//import java.io.InputStreamReader;
+//import java.net.HttpURLConnection;
+//import java.net.URL;
+//import java.util.ArrayList;
+//import java.util.List;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+//import android.content.pm.PackageInfo;
+//import android.content.pm.PackageManager.NameNotFoundException;
+//import android.os.AsyncTask;
+import android.os.Bundle;
+//import android.os.Looper;
+//import android.text.TextUtils;
+//import android.util.Log;
+//import android.view.Gravity;
+import android.view.View;
+//import android.view.inputmethod.EditorInfo;
+//import android.widget.ArrayAdapter;
+import android.widget.Button;
+//import android.widget.Toast;
+//import android.widget.AdapterView.OnItemSelectedListener;
+
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.pranav.driverApp.R;
+
+public class RegisterActivity extends Activity {
+
+	Button btnGCMRegister;
+	Button btnAppShare;
+	GoogleCloudMessaging gcm;
+	Context context;
+	String regId;
+
+	public static final String REG_ID = "regId";
+	//private static final String APP_VERSION = "appVersion";
+
+	static final String TAG = "Register Activity";
+	static String Dutytext=""; 
+	static String username="";
+	static String password=""; 
+	public   String onoff="";
+	static int flag=0;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_register);
+
+		context = getApplicationContext();
+
+
+		//get current duty status
+		SharedPreferences spref = getSharedPreferences("com.pranav.driverapp", Context.MODE_PRIVATE);
+
+		if(spref.getString("username", "XYZZY").equals("XYZZY")) //usr already logged in. show register activity
+		{
+			Intent a = new Intent(RegisterActivity.this, LoginActivity.class);
+			startActivity(a);
+		}
+
+
+		if(spref.getBoolean("duty", false))
+		{
+
+			Dutytext="Go Off Duty";
+		}
+		else
+		{
+			Dutytext="Go On Duty";
+			stopService(new Intent(getBaseContext(), Location_service.class));			
+		}
+
+		username=spref.getString("username","CAN'T HAPPEN");
+		password=spref.getString("password","CAN'T HAPPEN");
+
+
+		Button Logout = (Button) findViewById(R.id.logout);
+
+		Logout.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				SharedPreferences spref = getSharedPreferences("com.pranav.driverapp", Context.MODE_PRIVATE);
+				Editor x= spref.edit();
+				x.remove("username");
+				x.commit();
+
+				Intent intent= new Intent(context,LoginActivity.class);
+				startActivity(intent);
+
+
+			}
+		});
+
+
+
+		Button btnOnOffDuty = (Button) findViewById(R.id.OnOffDuty);
+		btnOnOffDuty.setText(Dutytext);
+
+		btnOnOffDuty.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+
+				//	String onoff;
+				SharedPreferences spref = getSharedPreferences("com.pranav.driverapp", Context.MODE_PRIVATE);
+				if(!spref.getBoolean("duty", false)) //if current value is false, driver wants to go on duty
+				{	onoff="free";
+					    	startService(new Intent(getBaseContext(), Location_service.class));			
+
+				}
+
+				else
+				{
+					onoff="busy";
+					stopService((new Intent(getBaseContext(), Location_service.class)));	
+
+				}
+
+		//		final List<String> inf=new ArrayList<String>();
+
+
+//				Thread t1 = new Thread()
+//				{
+//
+//					public void run()
+//					{
+//						Looper.prepare();
+//						try
+//						{
+//
+//							String address="http://testapp1pranav.appspot.com/markdriver?&email="+username+"&pass="+password+"&state="+onoff;
+//							URL object = new URL(address);
+//							HttpURLConnection connect = (HttpURLConnection) object.openConnection();
+//							connect.setRequestMethod("GET");
+//							int status = connect.getResponseCode();
+//
+//							BufferedReader reader = new BufferedReader( new InputStreamReader(connect.getInputStream()));
+//							String line;
+//							//StringBuffer buffer = new StringBuffer();
+//							while ((line = reader.readLine()) != null)
+//							{
+//								//buffer.append(line);
+//								inf.add(line);
+//							}
+//							Toast toast= Toast.makeText(RegisterActivity.this,"Duty Status Changed", Toast.LENGTH_SHORT);
+//							toast.setGravity(Gravity.CENTER, 0, 0);
+//							toast.show();
+//							reader.close();		 
+//
+//						}
+//						catch(Exception e)
+//						{
+//							Log.e("Driverapp",e.toString());
+//						}
+//						//Looper.loop();
+//					}
+//				};
+//				t1.start();
+
+
+//				if(onoff.equals("free"))
+//				{
+//					startService(new Intent(getBaseContext(), Location_service.class));
+//				}
+//				if(onoff.equals("busy"))
+//				{
+//					stopService((new Intent(getBaseContext(), Location_service.class)));	
+//				}
+
+
+				Editor edit=spref.edit();
+				edit.putBoolean("duty", !spref.getBoolean("duty", true));
+				edit.commit();
+
+
+
+				if(spref.getBoolean("duty", false))
+					Dutytext="Go Off Duty";
+				else
+					Dutytext="Go On Duty";
+
+				Button b =(Button)findViewById(R.id.OnOffDuty);
+				b.setText(Dutytext);
+
+			}
+		});
+
+
+	}
+}
